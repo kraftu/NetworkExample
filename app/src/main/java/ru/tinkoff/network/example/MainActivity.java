@@ -13,6 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public String call() throws Exception {
             //https://httpbin.org/html
-            OkHttpClient client = new OkHttpClient();
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .build();
 
             Request request = new Request.Builder()
                     .url("http://httpbin.org/html")
