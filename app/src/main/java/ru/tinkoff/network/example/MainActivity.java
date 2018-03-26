@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -49,13 +50,19 @@ public class MainActivity extends AppCompatActivity {
         @SuppressWarnings("ConstantConditions")
         @Override
         public String call() throws Exception {
-            //https://httpbin.org/html
+            //https://docs.postman-echo.com
             OkHttpClient client = new OkHttpClient.Builder()
                     .addNetworkInterceptor(new StethoInterceptor())
                     .build();
 
+            HttpUrl httpUrl = HttpUrl.parse("https://postman-echo.com/get")
+                    .newBuilder()
+                    .addQueryParameter("parameter1","value1")
+                    .addQueryParameter("parameter2","value2")
+                    .build();
+
             Request request = new Request.Builder()
-                    .url("http://httpbin.org/html")
+                    .url(httpUrl)
                     .build();
 
             Response response = client.newCall(request).execute();
