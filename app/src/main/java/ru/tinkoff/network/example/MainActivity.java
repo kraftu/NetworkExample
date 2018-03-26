@@ -5,6 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Single;
@@ -34,16 +39,44 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(
                         this::printResult,
                         throwable -> printResult(
-                                "Throwable:\n" + throwable.toString()
+                                "Exception:\n" + throwable.toString()
                         )
                 );
     }
 
-    static class BackgroundTask implements  Callable<String>{
+    static class BackgroundTask implements Callable<String> {
 
         @Override
         public String call() throws Exception {
-            return "BackgroundTask";
+            //https://httpbin.org/html
+
+            InetAddress addr = InetAddress.getByName("httpbin.org");
+            Socket socket = new Socket(addr, 80);
+
+            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            // send an HTTP request to the web server
+            String httpRequest = "GET /html HTTP/1.1\r\n"
+                    + "Host: httpbin.org\r\n"
+                    + "Connection: Close\r\n"
+                    + "\r\n";
+
+            out.print(httpRequest);
+            out.flush();
+
+            // read the response
+            StringBuilder sb = new StringBuilder();
+
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+
+            socket.close();
+            return sb.toString();
         }
+
+
     }
 }
