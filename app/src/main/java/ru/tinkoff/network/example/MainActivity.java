@@ -1,5 +1,6 @@
 package ru.tinkoff.network.example;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     static class BackgroundTask implements Callable<String> {
 
+        @SuppressLint("DefaultLocale")
         @SuppressWarnings("ConstantConditions")
         @Override
         public String call() throws Exception {
@@ -68,6 +70,15 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             Response response = client.newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                return String.format(
+                        "Not successful request:\n%d %s",
+                        response.code(),
+                        response.message()
+                );
+            }
+
             return response.body().string();
         }
     }
