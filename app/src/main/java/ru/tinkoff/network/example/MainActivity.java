@@ -5,16 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,37 +44,18 @@ public class MainActivity extends AppCompatActivity {
 
     static class BackgroundTask implements Callable<String> {
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public String call() throws Exception {
             //https://httpbin.org/html
+            OkHttpClient client = new OkHttpClient();
 
-            InetAddress addr = InetAddress.getByName("httpbin.org");
-            Socket socket = new Socket(addr, 80);
+            Request request = new Request.Builder()
+                    .url("http://httpbin.org/html")
+                    .build();
 
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            // send an HTTP request to the web server
-            String httpRequest = "GET /html HTTP/1.1\r\n"
-                    + "Host: httpbin.org\r\n"
-                    + "Connection: Close\r\n"
-                    + "\r\n";
-
-            out.print(httpRequest);
-            out.flush();
-
-            // read the response
-            StringBuilder sb = new StringBuilder();
-
-            String line;
-            while ((line = in.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-
-            socket.close();
-            return sb.toString();
+            Response response = client.newCall(request).execute();
+            return response.body().string();
         }
-
-
     }
 }
