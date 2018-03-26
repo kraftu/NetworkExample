@@ -12,9 +12,10 @@ import java.util.concurrent.Callable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.HttpUrl;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,14 +56,15 @@ public class MainActivity extends AppCompatActivity {
                     .addNetworkInterceptor(new StethoInterceptor())
                     .build();
 
-            HttpUrl httpUrl = HttpUrl.parse("https://postman-echo.com/get")
-                    .newBuilder()
-                    .addQueryParameter("parameter1","value1")
-                    .addQueryParameter("parameter2","value2")
+
+            RequestBody formBody = new FormBody.Builder()
+                    .add("user", "testUser")
+                    .add("password", "qwer1234")
                     .build();
 
             Request request = new Request.Builder()
-                    .url(httpUrl)
+                    .url("https://postman-echo.com/get")
+                    .post(formBody)
                     .build();
 
             Response response = client.newCall(request).execute();
