@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SeminarExample</string>
+    <string name="perform_request">Выполнить запрос</string>
+    <string name="title_result">Результат:</string>
+</resources>
